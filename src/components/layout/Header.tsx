@@ -1,8 +1,17 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Rocket } from 'lucide-react';
+import { Rocket, LogOut, User } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
 
 export default function Header() {
+  const { isAuthenticated, user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+  };
+
   return (
     <header className="border-b">
       <div className="container mx-auto px-4 py-4 flex justify-between items-center">
@@ -23,10 +32,41 @@ export default function Header() {
           >
             About
           </Link>
+          {isAuthenticated && (
+            <>
+              <Link
+                to="/dashboard"
+                className="text-sm font-medium hover:text-primary transition-colors"
+              >
+                Dashboard
+              </Link>
+              <Link
+                to="/profile"
+                className="text-sm font-medium hover:text-primary transition-colors"
+              >
+                Profile
+              </Link>
+            </>
+          )}
         </nav>
-        <Button className="hidden md:flex" asChild>
-          <Link to="/about">Get Started</Link>
-        </Button>
+        <div className="hidden md:flex items-center space-x-4">
+          {isAuthenticated ? (
+            <>
+              <div className="flex items-center space-x-2 text-sm text-muted-foreground">
+                <User className="h-4 w-4" />
+                <span>{user?.name}</span>
+              </div>
+              <Button variant="outline" onClick={handleLogout}>
+                <LogOut className="mr-2 h-4 w-4" />
+                Logout
+              </Button>
+            </>
+          ) : (
+            <Button asChild>
+              <Link to="/login">Login</Link>
+            </Button>
+          )}
+        </div>
         <Button variant="ghost" size="icon" className="md:hidden">
           <svg
             xmlns="http://www.w3.org/2000/svg"
